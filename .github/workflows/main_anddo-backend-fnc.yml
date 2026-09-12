@@ -1,25 +1,22 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure Functions: https://aka.ms/python-webapps-actions
+# Docs for GitHub Actions: https://docs.github.com/en/actions
 
-name: Build and deploy Python project to Azure Function App - anddo-backend-fnc
+name: CI - Build and Test Python Project
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
-  PYTHON_VERSION: '3.12' # set this to the python version to use (supports 3.6, 3.7, 3.8)
+  PYTHON_VERSION: "3.12"
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read #This is required for actions/checkout
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,54 +29,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # Instala exatamente onde a Azure espera encontrar no Linux
-          pip install --target=".python_packages/lib/site-packages" -r requirements.txt
+          pip install -r requirements.txt
 
-      # Optional: Add step to run tests here
+      - name: Check Python compilation
+        run: python -m compileall .
 
-      - name: Zip artifact for deployment
-        run: zip -r release.zip . -x "venv/*" ".git/*" ".github/*" "_diagrams/*" "_tests/*"
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-app
-          path: |
-            release.zip
-            !venv/
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
-    steps:
-    - name: Download artifact from build job
-      uses: actions/download-artifact@v4
-      with:
-        name: python-app
-
-    - name: Unzip artifact for deployment
-      run: |
-        unzip release.zip
-        rm release.zip
-          
-    - name: Login to Azure
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-    - name: 'Deploy to Azure Functions'
-      uses: Azure/functions-action@v1
-      id: deploy-to-function
-      with:
-        app-name: 'anddo-backend-fnc'
-        #slot-name: 'Production'
-        #package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-        package: '.'
-        scm-do-build-during-deployment: true
-        enable-oryx-build: true
+      - name: Run tests
+        run: pytest

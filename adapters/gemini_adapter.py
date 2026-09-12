@@ -38,7 +38,6 @@ class GeminiAdapter:
                 types.Content(role=msg.role, parts=[types.Part(text=msg.text)])
                 for msg in client.msg_history
             ]
-            logger.debug(f"MESSAGE HISTORY: {[h.parts[0].text + '|' for h in history]}")
             
             config_gen = types.GenerateContentConfig(
                 tools=tools_list,
@@ -55,8 +54,6 @@ class GeminiAdapter:
                 function_responses = []
                 
                 for part in response.candidates[0].content.parts:
-
-                    logger.debug(f"Parte da resposta: text='{part.text}', function_call='{part.function_call}'")
 
                     if part.function_call:
                         call = part.function_call
@@ -84,8 +81,6 @@ class GeminiAdapter:
                     response = chat.send_message(function_responses)
                 else:
                     break
-            
-            logger.debug(f"Resposta final da IA: {response.candidates[0].content.parts[0].text}")
             
             for part in response.candidates[0].content.parts:
                 if part.text:

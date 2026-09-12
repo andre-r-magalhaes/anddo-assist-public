@@ -66,8 +66,6 @@ class Processor:
             :param termo: O nome do produto, categoria ou material (ex: 'porcelanato polido').
             """
             return self.db_inventory.pesquisar_produtos(business_id=business.business_id, termo=termo)
-
-        logger.debug(f"MESSAGE HISTORY: {[h.text + ' | ' for h in client.msg_history]}")
             
         resposta = self.ia.get_answer(business, client, tools_list=[pesquisar_produtos])
         
@@ -89,12 +87,13 @@ class Processor:
                 to_number=client.client_id,   # O wa_id do cliente
                 text=resposta
             )
-            logger.info(f"Mensagem enviada para WABA. Status: {response.get('messages', [{}])[0].get('status', 'N/A')}")
+            if response:
+                logger.info(f"Mensagem enviada para WABA com sucesso.")
+            else:
+                logger.warning(f"Falha ou ausência de retorno no envio da mensagem WABA.")
             
         except Exception as e:
             logger.error(f"Erro ao enviar mensagem para WABA: {str(e)}")
             return resposta # Mesmo que dê erro no envio, a resposta da IA é válida e pode ser usada para outros fins (ex: análise, fallback, etc)
-
-        logger.debug(f"Resposta do WABA {response.get("messages")}")
 
         return resposta

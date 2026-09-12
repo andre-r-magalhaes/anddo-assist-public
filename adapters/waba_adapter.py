@@ -30,16 +30,22 @@ class WabaAdapter:
                 }
             }
 
-            response = requests.post(url, json=payload, headers=headers)
-            response_data = response.json()
-            
-            logger.debug(f"Resposta do WABA: {response_data}")
+            response = requests.post(url, json=payload, headers=headers, timeout=10)
             
             if response.status_code != 200:
-                logger.error(f"Erro ao enviar para WABA: {response.status_code} - {response.text}")
+                logger.error(f"Erro ao enviar para WABA: HTTP {response.status_code}")
                 response.raise_for_status()
-                
-        except Exception as e:
-            logger.error(f"Falha na comunicação com a API da Meta: {str(e)}")
 
-        return response.json()
+            response_data = response.json()
+            logger.debug(f"Mensagem entregue ao WABA com sucesso. Status HTTP: {response.status_code}")
+            return response_data
+                
+        except requests.exceptions.Timeout:
+            logger.error("Timeout na comunicação com a API da Meta/WABA.")
+            return None
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Falha na comunicação com a API da Meta: HTTP/Request error ({type(e).__name__})")
+            return None
+        except Exception as e:
+            logger.error(f"Erro inesperado no envio de mensagem WABA: ({type(e).__name__})")
+            return None
