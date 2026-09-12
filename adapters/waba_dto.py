@@ -63,7 +63,8 @@ class WabaDTO(BaseModel, IClientProvider):
             msg = value.messages[0]
             user_name = contact.profile.name if contact.profile else "Vizinho"
 
-            logger.debug(f"WabaDTO: {value.model_dump_json()}")
+            # Remover logs que expõem dados pessoais
+            # logger.debug(f"WabaDTO: {value.model_dump_json()}")
 
             current_message = MessageModel(
                 business_id=value.metadata.phone_number_id,
