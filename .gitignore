@@ -20,7 +20,7 @@ __tablestorage__/
 AzuriteConfig
 debug.log
 .venv/
-.vscode/
+
 bin/
 obj/
 
@@ -52,6 +52,8 @@ coverage.xml
 *.user
 *.userosscache
 *.sln.docstates
+.vscode/
+
 
 # Backup & temp files
 *.bak
