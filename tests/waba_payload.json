@@ -1,0 +1,27 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "WHATSAPP_BUSINESS_ACCOUNT_ID",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": { "display_phone_number": "00000000000", "phone_number_id": "12345" },
+            "contacts": [{ "profile": { "name": "Contato Exemplo" }, "wa_id": "00000000000" }],
+            "messages": [
+              {
+                "from": "00000000000",
+                "id": "wamid.HBgLNTUxMTk5OTk5OTk5OQ==",
+                "timestamp": "1671234567",
+                "text": { "body": "Qual o cardápio de hoje?" },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}
