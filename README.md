@@ -1,16 +1,50 @@
-# Anddo Assistant Public
+🇺🇸 English | 🇧🇷 [Português](README.pt-br.md)
 
-## Objetivo
+# Anddo Assistant (Public)
 
-Este projeto é um assistente de integração entre a WhatsApp Business API (WABA) e o modelo Gemini da Google. Ele processa mensagens recebidas via webhook, envia para uma fila Azure, processa com o modelo Gemini e responde via WABA.
+A serverless WhatsApp assistant that integrates the WhatsApp Business API, Azure Functions, and Google Gemini to answer customer questions with business context — built as a portfolio-grade demonstration of production-style architecture, not a toy script.
 
-## Arquitetura
+## Objective
 
-O fluxo principal é:
+This project processes messages received via WhatsApp webhook, queues them asynchronously in Azure, enriches them with business context (catalog, conversation history), generates a response with Gemini, and replies back through WhatsApp Business API.
 
-1. Webhook da Meta (WABA) -> Queue (Azure) -> Processor (Gemini) -> Resposta via WABA
+## Architecture
 
-## Tecnologias
+The flow decouples the webhook (fast, stateless) from the actual processing (context lookup + LLM call), using a queue in between — so a slow AI response never blocks the webhook or risks WhatsApp retry timeouts.
+
+```mermaid
+sequenceDiagram
+    participant U as WhatsApp Client
+    participant WA as WhatsApp Business API
+    participant WH as Webhook Function (Producer)
+    participant Q as Azure Storage Queue
+    participant BR as Broker Function (Consumer)
+    participant DB as Azure Table Storage
+    participant AI as Gemini 2.5 Flash
+
+    U->>WA: Send message
+    WA->>WH: Webhook (payload)
+    Note over WH: Validate API key (env var)
+    WH->>Q: Enqueue message (JSON)
+    WH-->>WA: HTTP 200 OK
+    Q->>BR: Trigger (new message)
+    BR->>DB: Load history + business context
+    DB-->>BR: Return context
+    Note over BR: Build prompt (LangChain)
+    BR->>AI: Send prompt + context
+    AI-->>BR: Return response text
+    BR->>WA: POST /message/sendText
+    WA->>U: Deliver reply
+    BR->>DB: Save updated history
+```
+
+## See It In Action
+
+An example conversation with a fictional flooring & tile retailer ("Mestre dos Pisos"), showing the assistant answering a product question using catalog context (item, price, and use-case fit) rather than a generic reply:
+
+![Example conversation: a customer asks about slip-resistant flooring and the assistant answers with two specific products and prices from the store's catalog](docs/assets/example-conversation.png)
+
+## Tech Stack
 
 - Python
 - Azure Functions
@@ -19,72 +53,78 @@ O fluxo principal é:
 - Google Gemini API
 - WhatsApp Business API
 
-## Pré-requisitos
+## Project Structure
+
+```
+adapters/   # External integrations (WhatsApp, Gemini, storage)
+core/       # Business logic and orchestration
+data/       # Data access layer
+models/     # Domain models / DTOs
+tests/      # Unit and integration tests
+utils/      # Shared helpers
+```
+
+## Prerequisites
 
 - Python 3.12
-- Conta na Google Cloud com acesso ao Google Gemini API
-- Conta na Azure com acesso ao Azure Functions e Azure Storage
-- Conta na Meta para acesso à WhatsApp Business API
+- A Google Cloud account with access to the Gemini API
+- An Azure account with access to Azure Functions and Azure Storage
+- A Meta account with access to the WhatsApp Business API
 
-## Instalação
+## Installation
 
-1. Clone o repositório:
+1. Clone the repository:
 
 ```bash
-
 git clone https://github.com/andre-r-magalhaes/anddo-assist-public.git
 cd anddo-assist-public
 ```
 
-2. Instale as dependências:
+2. Install dependencies:
 
 ```bash
-
 pip install -r requirements.txt
 ```
 
-## Configuração
+## Configuration
 
-Crie um arquivo `.env` na raiz do projeto com base no `.env.example` e preencha as variáveis de ambiente necessárias. Exporte as variáveis de ambiente antes de executar o projeto:
+Create a `.env` file at the project root based on `.env.example` and fill in the required environment variables. Export them before running the project:
 
 ```bash
-
 export $(grep -v '^#' .env | xargs)
 ```
 
-## Executando Testes
+## Running Tests
 
 ```bash
-
 pytest
 ```
 
-## Diferenciação de Testes
+**Test types:**
+- **Unit tests** — no external credentials required; run fully locally.
+- **Gemini integration tests** — require the `GOOGLE_API_KEY` environment variable; skipped automatically if it's not set.
 
-- **Testes Unitários**: Testes que não dependem de credenciais externas e podem ser executados localmente.
-- **Testes de Integração com Gemini**: Testes que dependem da variável de ambiente `GOOGLE_API_KEY` e são marcados como testes de integração. Eles são pulados se a variável não estiver configurada.
+## Known Limitations
 
-## Limitações Conhecidas
+- The WABA version must be compatible with the current implementation.
+- The Gemini API key must be valid and have sufficient quota.
 
-- A versão do WABA deve ser compatível com a implementação atual.
-- A chave da API do Google Gemini deve ser válida e ter cotas suficientes.
+## Project Status
 
-## Status do Projeto
+This is a portfolio demonstration project and is not running in production. It serves as an example of integrating messaging services with generative AI.
 
-Este projeto é um portfólio demonstrativo e não está em produção. Ele serve como exemplo de integração entre serviços de mensagens e IA generativa.
+## Security
 
-## Segurança
+- Never commit credentials or tokens to the repository.
+- Configure secrets in the deployment environment.
+- Validate the Meta webhook signature before using this in production.
+- Avoid logging personal data.
+- Deployment is not automated in this portfolio repository.
 
-- Nunca comite credenciais ou tokens no repositório.
-- Configure secrets no ambiente de deploy.
-- Valide a assinatura do webhook da Meta antes de usar em produção.
-- Evite registrar dados pessoais nos logs.
-- O deploy não é executado automaticamente neste repositório de portfólio.
+## Contributing
 
-## Contribuição
+Feel free to open issues and pull requests.
 
-Sinta-se à vontade para abrir issues e pull requests.
+## License
 
-## Licença
-
-Este projeto está licenciado sob a Licença MIT.
+This project is licensed under the MIT License.
