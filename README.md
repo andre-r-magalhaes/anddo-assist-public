@@ -32,7 +32,7 @@ O fluxo principal é:
 
 ```bash
 
-git clone https://github.com/anddo-dev/anddo-assist-public.git
+git clone https://github.com/andre-r-magalhaes/anddo-assist-public.git
 cd anddo-assist-public
 ```
 
