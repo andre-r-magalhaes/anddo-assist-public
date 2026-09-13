@@ -24,13 +24,13 @@ sequenceDiagram
 
     U->>WA: Send message
     WA->>WH: Webhook (payload)
-    Note over WH: Validate API key (env var)
+    Note over WH: Validate WABA_VERIFY_TOKEN
     WH->>Q: Enqueue message (JSON)
     WH-->>WA: HTTP 200 OK
     Q->>BR: Trigger (new message)
     BR->>DB: Load history + business context
     DB-->>BR: Return context
-    Note over BR: Build prompt (LangChain)
+    Note over BR: Build prompt
     BR->>AI: Send prompt + context
     AI-->>BR: Return response text
     BR->>WA: POST /message/sendText
@@ -103,6 +103,8 @@ pytest
 **Test types:**
 - **Unit tests** — no external credentials required; run fully locally.
 - **Gemini integration tests** — require the `GOOGLE_API_KEY` environment variable; skipped automatically if it's not set.
+
+> **Note:** part of the current test suite is still legacy scripts rather than proper pytest functions. They're being converted incrementally — treat the suite as a work in progress, not full coverage yet.
 
 ## Known Limitations
 

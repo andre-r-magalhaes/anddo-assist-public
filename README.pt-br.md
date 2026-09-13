@@ -22,13 +22,13 @@ sequenceDiagram
 
     U->>WA: Envia mensagem
     WA->>WH: Webhook (payload)
-    Note over WH: Valida apiKey (env var)
+    Note over WH: Valida WABA_VERIFY_TOKEN
     WH->>Q: Enfileira mensagem (JSON)
     WH-->>WA: HTTP 200 OK
     Q->>BR: Trigger (nova mensagem)
     BR->>DB: Busca histórico + contexto de negócio
     DB-->>BR: Retorna contexto
-    Note over BR: Monta prompt (LangChain)
+    Note over BR: Monta prompt
     BR->>AI: Envia prompt + contexto
     AI-->>BR: Retorna texto de resposta
     BR->>WA: POST /message/sendText
@@ -101,6 +101,8 @@ pytest
 **Diferenciação de testes:**
 - **Testes Unitários** — não dependem de credenciais externas e podem ser executados localmente.
 - **Testes de Integração com Gemini** — dependem da variável de ambiente `GOOGLE_API_KEY` e são marcados como testes de integração. São pulados se a variável não estiver configurada.
+
+> **Nota:** parte da suíte atual ainda é composta por scripts legados em vez de funções pytest propriamente ditas. Estão sendo convertidos aos poucos — trate a suíte como trabalho em andamento, ainda sem cobertura completa.
 
 ## Limitações Conhecidas
 
