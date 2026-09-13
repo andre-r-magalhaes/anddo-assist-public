@@ -1,7 +1,6 @@
 🇺🇸 English | 🇧🇷 [Português](README.pt-br.md)
 
 # Anddo Assistant (Public)
-# Anddo Assistant
 
 [![CI](https://github.com/andre-r-magalhaes/anddo-assist-public/actions/workflows/main_anddo-backend-fnc.yml/badge.svg)](https://github.com/andre-r-magalhaes/anddo-assist-public/actions/workflows/main_anddo-backend-fnc.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
