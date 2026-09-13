@@ -1,6 +1,11 @@
 🇺🇸 English | 🇧🇷 [Português](README.pt-br.md)
 
 # Anddo Assistant (Public)
+# Anddo Assistant
+
+[![CI](https://github.com/andre-r-magalhaes/anddo-assist-public/actions/workflows/main_anddo-backend-fnc.yml/badge.svg)](https://github.com/andre-r-magalhaes/anddo-assist-public/actions/workflows/main_anddo-backend-fnc.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 
 A serverless WhatsApp assistant that integrates the WhatsApp Business API, Azure Functions, and Google Gemini to answer customer questions with business context — built as a portfolio-grade demonstration of production-style architecture, not a toy script.
 
